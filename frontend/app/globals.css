@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --teal: #006D77;
+  --berry: #922D50;
+  --beige: #F2F3D9;
+  --bronze: #DC9E82;
+  --rose: #C16E70;
+  --text-main: #1A1C1E;
+}
+
+@layer base {
+  body {
+    @apply bg-[#F2F3D9] text-[#1A1C1E] antialiased;
+    /* Clean, soft gradients that don't muddy the beige */
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(0, 109, 119, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(146, 45, 80, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .liquid-card {
+    @apply bg-white/60 backdrop-blur-3xl border border-white rounded-[3rem] shadow-[0_20px_50px_rgba(0,109,119,0.05)] transition-all duration-700;
+  }
+  
+  .liquid-card:hover {
+    @apply bg-white/80 -translate-y-3 shadow-[0_40px_80px_rgba(0,109,119,0.1)];
+  }
+
+  .btn-liquid {
+    @apply px-10 py-5 rounded-full font-black text-xl transition-all duration-500 shadow-xl shadow-[#006D77]/20;
+    background: linear-gradient(135deg, var(--teal), var(--rose));
+    color: white;
+  }
+
+  .btn-liquid:hover {
+    @apply scale-105 shadow-2xl shadow-[#006D77]/40;
+    filter: saturate(1.2);
+  }
+
+  .btn-liquid-secondary {
+    @apply px-10 py-5 rounded-full font-black text-xl transition-all border-4 border-[#006D77] text-[#006D77] hover:bg-[#006D77] hover:text-white;
+  }
+
+  .liquid-text-hero {
+    @apply font-black tracking-tighter leading-[0.8] text-[#1A1C1E];
+    font-size: clamp(4rem, 15vw, 12rem);
+  }
+
+  .accent-gradient {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-[#006D77] to-[#922D50];
+  }
+}
+
+/* Organic Liquid Shapes */
+.blob {
+  @apply absolute -z-10 blur-[120px] opacity-20 animate-pulse;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(100px, 50px) rotate(10deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.animate-liquid {
+  animation: float 25s infinite ease-in-out;
+}

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+backend/venv/
+.env
+.env.local
+*.json
+!package.json
+!tsconfig.json
+
+# Next.js
+.next/
+out/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+!frontend/public/

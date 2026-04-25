@@ -1,0 +1,65 @@
+steps:
+  # 1. Install frontend dependencies and build
+  - name: 'node:20'
+    entrypoint: 'npm'
+    args: ['ci']
+    dir: 'frontend'
+    id: 'frontend-install'
+
+  - name: 'node:20'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    dir: 'frontend'
+    id: 'frontend-build'
+    waitFor: ['frontend-install']
+    env:
+      - 'NEXT_PUBLIC_API_BASE_URL=$_API_URL'
+      - 'NEXT_PUBLIC_FIREBASE_API_KEY=$_FIREBASE_API_KEY'
+      - 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$_FIREBASE_AUTH_DOMAIN'
+      - 'NEXT_PUBLIC_FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID'
+      - 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$_FIREBASE_STORAGE_BUCKET'
+      - 'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$_FIREBASE_MESSAGING_SENDER_ID'
+      - 'NEXT_PUBLIC_FIREBASE_APP_ID=$_FIREBASE_APP_ID'
+
+  # 2. Deploy frontend to Firebase Hosting
+  - name: 'gcr.io/$PROJECT_ID/firebase'
+    args: ['deploy', '--project=$PROJECT_ID', '--only=hosting']
+    dir: 'frontend'
+    id: 'frontend-deploy'
+    waitFor: ['frontend-build']
+
+  # 3. Build backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/trustmark-api:$COMMIT_SHA', '.']
+    dir: 'backend'
+    id: 'backend-docker-build'
+    waitFor: ['-'] # Start immediately
+
+  # 4. Push backend image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/trustmark-api:$COMMIT_SHA']
+    id: 'backend-docker-push'
+    waitFor: ['backend-docker-build']
+
+  # 5. Deploy backend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'trustmark-api'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/trustmark-api:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+    id: 'backend-deploy'
+    waitFor: ['backend-docker-push']
+
+images:
+  - 'gcr.io/$PROJECT_ID/trustmark-api:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
