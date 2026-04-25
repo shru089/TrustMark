@@ -109,7 +109,7 @@ def _generate_sync(image_bytes: bytes) -> dict:
     """Synchronous Gemini call – executed in thread pool."""
     _ensure_vertex_init()
 
-    model = GenerativeModel("gemini-1.5-pro-vision")
+    model = GenerativeModel("gemini-1.5-pro")
 
     # Wrap raw bytes as a Vertex AI Part
     image_part = Part.from_data(data=image_bytes, mime_type="image/png")

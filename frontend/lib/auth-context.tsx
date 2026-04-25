@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       console.error("Sign-in error:", error);
       if (error.code === "auth/unauthorized-domain") {
-        alert("Domain not authorized! Please add localhost:3001 to Firebase -> Auth -> Settings -> Authorized Domains.");
+        alert("Domain not authorized! Please add localhost:3005 to Firebase → Auth → Settings → Authorized Domains.");
       } else {
         alert(`Sign-in failed: ${error.message}`);
       }

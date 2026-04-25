@@ -31,13 +31,16 @@
     @apply bg-white/80 -translate-y-3 shadow-[0_40px_80px_rgba(0,109,119,0.1)];
   }
 
-  .btn-liquid {
+  /* Primary gradient button (used as btn-liquid-primary throughout app) */
+  .btn-liquid,
+  .btn-liquid-primary {
     @apply px-10 py-5 rounded-full font-black text-xl transition-all duration-500 shadow-xl shadow-[#006D77]/20;
     background: linear-gradient(135deg, var(--teal), var(--rose));
     color: white;
   }
 
-  .btn-liquid:hover {
+  .btn-liquid:hover,
+  .btn-liquid-primary:hover {
     @apply scale-105 shadow-2xl shadow-[#006D77]/40;
     filter: saturate(1.2);
   }
@@ -49,6 +52,20 @@
   .liquid-text-hero {
     @apply font-black tracking-tighter leading-[0.8] text-[#1A1C1E];
     font-size: clamp(4rem, 15vw, 12rem);
+  }
+
+  /* Gradient text used on page headings in protect/verify pages */
+  .liquid-text-gradient {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(135deg, var(--teal), var(--rose));
+  }
+
+  /* Styled input/textarea for the protect form */
+  .liquid-input {
+    @apply w-full bg-white/70 border border-white/80 rounded-2xl px-6 py-4
+           text-[#1A1C1E] placeholder-gray-400
+           focus:outline-none focus:ring-2 focus:ring-[#006D77]/40 focus:border-[#006D77]
+           transition-all duration-300;
   }
 
   .accent-gradient {
