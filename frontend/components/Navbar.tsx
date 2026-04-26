@@ -3,39 +3,71 @@
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import AuthButton from "@/components/AuthButton";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <nav className="bg-white/40 backdrop-blur-3xl border-b border-white/60 sticky top-0 z-50 px-6 py-1">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-16">
-            <Link href="/" className="text-3xl font-black text-[#1a1c1e] tracking-tighter flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#006D77] to-[#922D50] shadow-lg group-hover:rotate-180 transition-transform duration-1000" />
-              TrustMark
-            </Link>
-            
-            <div className="hidden md:flex space-x-10">
-              <Link href="/protect" className="text-gray-600 hover:text-[#006D77] transition-colors font-bold text-lg">
-                Protect
-              </Link>
-              <Link href="/verify" className="text-gray-600 hover:text-[#922D50] transition-colors font-bold text-lg">
-                Verify
-              </Link>
-              {user && (
-                <Link href="/dashboard" className="text-gray-600 hover:text-[#DC9E82] transition-colors font-bold text-lg">
-                  Dashboard
-                </Link>
-              )}
-            </div>
+    <nav
+      className={`sticky top-0 z-50 px-6 transition-all duration-500 ${
+        scrolled
+          ? "py-3 bg-[#050D1A]/80 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+          : "py-5 bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-3 group"
+          aria-label="TrustMark Home"
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00C2CB] to-[#E63E6D] shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
+              <path d="M12 2L3 7l9 5 9-5-9-5z" fill="currentColor" opacity="0.9"/>
+              <path d="M3 12l9 5 9-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M3 17l9 5 9-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+            </svg>
           </div>
+          <span className="text-xl font-bold tracking-tight text-white font-[Space_Grotesk,sans-serif]">
+            Trust<span className="text-gradient">Mark</span>
+          </span>
+        </Link>
 
-          <div className="flex items-center">
-            <AuthButton />
-          </div>
+        {/* Nav links */}
+        <div className="hidden md:flex items-center gap-1">
+          <Link
+            href="/protect"
+            className="px-4 py-2 text-sm font-semibold text-[#8899AA] hover:text-white rounded-lg hover:bg-white/[0.05] transition-all"
+          >
+            Protect
+          </Link>
+          <Link
+            href="/verify"
+            className="px-4 py-2 text-sm font-semibold text-[#8899AA] hover:text-white rounded-lg hover:bg-white/[0.05] transition-all"
+          >
+            Verify
+          </Link>
+          {user && (
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 text-sm font-semibold text-[#8899AA] hover:text-white rounded-lg hover:bg-white/[0.05] transition-all"
+            >
+              Dashboard
+            </Link>
+          )}
         </div>
+
+        {/* Auth */}
+        <AuthButton />
       </div>
     </nav>
   );

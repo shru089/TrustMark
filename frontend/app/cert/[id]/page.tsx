@@ -27,7 +27,9 @@ export default function CertificatePage() {
     const fetchCert = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"}/api/v1/certificate/${assetId}`,
+          `${
+            process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"
+          }/api/v1/certificate/${assetId}`,
           { signal: controller.signal }
         );
         if (!res.ok) {
@@ -38,9 +40,12 @@ export default function CertificatePage() {
         setRecord(data);
       } catch (err: any) {
         if (err.name === "AbortError") {
-          setError("Request timed out. The TrustMark API is currently unavailable.");
-        } else if (err.message?.includes("Failed to fetch") || err.message?.includes("ERR_CONNECTION")) {
-          setError("Could not connect to the TrustMark API. Please try again later.");
+          setError("Request timed out. The API is currently unavailable.");
+        } else if (
+          err.message?.includes("Failed to fetch") ||
+          err.message?.includes("ERR_CONNECTION")
+        ) {
+          setError("Could not connect to the API. Please try again later.");
         } else {
           setError(err.message || "Certificate not found.");
         }
@@ -59,10 +64,12 @@ export default function CertificatePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full border-4 border-[#006D77]/30 border-t-[#006D77] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading certificate...</p>
+          <div className="w-16 h-16 rounded-full border-4 border-white/10 border-t-[#00C2CB] animate-spin mx-auto mb-4" />
+          <p className="text-[#8899AA] font-medium animate-pulse">
+            Retrieving provenance ledger...
+          </p>
         </div>
       </div>
     );
@@ -70,96 +77,157 @@ export default function CertificatePage() {
 
   if (error || !record) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-        <div className="liquid-card p-12 max-w-md w-full text-center">
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6">
+        <div className="glass-card max-w-md w-full p-12 text-center">
           <div className="text-5xl mb-6">❌</div>
-          <h2 className="text-2xl font-black text-[#922D50] mb-4">Invalid Certificate</h2>
-          <p className="text-gray-500 font-medium">{error || "Certificate not found."}</p>
+          <h2 className="text-2xl font-bold text-[#E63E6D] mb-4">
+            Invalid Certificate
+          </h2>
+          <p className="text-[#8899AA]">{error || "Certificate not found."}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-12 px-4 pb-20">
+    <div className="max-w-5xl mx-auto mt-12 px-6 pb-28">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#006D77] to-[#922D50] shadow-lg flex items-center justify-center text-white text-2xl font-black">
-          ◈
+      <div className="flex items-center gap-5 mb-12">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00C2CB] to-[#E63E6D] shadow-[0_0_30px_rgba(0,194,203,0.3)] flex items-center justify-center text-white text-3xl font-black">
+          🛡️
         </div>
         <div>
-          <h1 className="text-3xl font-black liquid-text-gradient">TrustMark Certificate</h1>
-          <p className="text-gray-400 text-sm font-medium">Verified Immutable Provenance Record</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            Provenance <span className="text-gradient">Certificate</span>
+          </h1>
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C2CB] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00C2CB]"></span>
+            </span>
+            <p className="text-[#00C2CB] text-sm font-semibold tracking-wide uppercase">
+              Verified Immutable Record
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main Card */}
-      <div className="liquid-card overflow-hidden">
-        <div className="p-8 flex flex-col md:flex-row gap-8">
-          {/* Image */}
-          <div className="w-full md:w-1/3 flex-shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={record.watermarked_image_url}
-              alt={record.title || "Protected Asset"}
-              className="w-full aspect-square object-cover rounded-2xl border border-white/60"
-            />
-            <div className="mt-4 text-center">
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#006D77]/10 text-[#006D77] text-xs font-bold border border-[#006D77]/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#006D77] animate-pulse"></span>
-                Watermark Verified
-              </span>
-            </div>
-          </div>
-
-          {/* Details */}
-          <div className="flex-1 space-y-6">
-            <div>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Asset Title</h2>
-              <p className="text-2xl font-black text-[#1A1C1E]">{record.title || "Untitled Asset"}</p>
+      {/* Main layout */}
+      <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+        {/* Left: Image & primary details */}
+        <div className="space-y-8">
+          <div className="glass-card p-6 border-[#00C2CB]/20">
+            {/* Image viewer */}
+            <div className="relative rounded-xl overflow-hidden bg-black/50 aspect-auto mb-6 group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={record.watermarked_image_url}
+                alt={record.title || "Protected Asset"}
+                className="w-full h-auto max-h-[600px] object-contain group-hover:scale-[1.02] transition-transform duration-700"
+              />
+              {/* Watermark overlay marker */}
+              <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-white/10 shadow-xl">
+                <div className="w-2 h-2 rounded-full bg-[#00C2CB] animate-pulse" />
+                <span className="text-xs font-bold text-white tracking-widest uppercase">
+                  Steganographic ID Embedded
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div>
-                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Owner Email</h2>
-                <p className="text-[#1A1C1E] font-semibold break-all">{record.owner_email}</p>
+                <h2 className="text-[#8899AA] text-xs font-bold uppercase tracking-widest mb-2">
+                  Asset Title
+                </h2>
+                <p className="text-3xl font-bold text-white">
+                  {record.title || "Untitled Asset"}
+                </p>
               </div>
-              <div>
-                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Registration Date</h2>
-                <p className="text-[#1A1C1E] font-semibold">{new Date(record.created_at).toLocaleString()}</p>
-              </div>
-            </div>
 
-            {record.description && (
-              <div>
-                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Description</h2>
-                <p className="text-gray-600 font-medium">{record.description}</p>
-              </div>
-            )}
-
-            <div>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">License Terms</h2>
-              <div className="inline-block px-4 py-1.5 rounded-full bg-[#006D77]/10 text-[#006D77] text-sm font-bold border border-[#006D77]/20">
-                {record.license_type}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">AI Semantic Fingerprint (SHA-256)</h2>
-              <p className="text-xs font-mono text-[#006D77] bg-[#006D77]/5 p-3 rounded-xl border border-[#006D77]/10 break-all">
-                {record.fingerprint}
-              </p>
+              {record.description && (
+                <div>
+                  <h2 className="text-[#8899AA] text-xs font-bold uppercase tracking-widest mb-2">
+                    Description
+                  </h2>
+                  <p className="text-white/80 leading-relaxed bg-white/[0.02] p-4 rounded-xl border border-white/[0.05]">
+                    {record.description}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-[#006D77]/5 border-t border-[#006D77]/10 p-6 flex flex-wrap justify-between items-center gap-4 text-sm text-gray-500">
-          <div>
-            Asset ID: <span className="font-mono text-[#1A1C1E] font-medium">{record.asset_id}</span>
+        {/* Right: Technical info */}
+        <div className="space-y-6">
+          <div className="glass-card glow-border p-8">
+            <h3 className="text-white font-bold text-lg mb-6 border-b border-white/[0.06] pb-4">
+              Cryptographic Ledger
+            </h3>
+
+            <div className="space-y-6 text-sm">
+              <div>
+                <h4 className="text-[#8899AA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                  Registered Owner
+                </h4>
+                <p className="text-white font-medium break-all bg-white/[0.03] px-3 py-2 rounded-lg border border-white/[0.05]">
+                  {record.owner_email}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-[#8899AA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                  Timestamp (UTC)
+                </h4>
+                <p className="text-white font-mono bg-white/[0.03] px-3 py-2 rounded-lg border border-white/[0.05]">
+                  {new Date(record.created_at).toISOString().replace("T", " ")}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-[#8899AA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                  License Terms
+                </h4>
+                <div className="inline-block bg-[#00C2CB]/10 text-[#00C2CB] px-3 py-1.5 rounded-md font-bold border border-[#00C2CB]/20">
+                  {record.license_type}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-[#8899AA] text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center justify-between">
+                  <span>Semantic AI Fingerprint</span>
+                  <span className="text-[#E63E6D] lowercase font-mono">
+                    SHA-256
+                  </span>
+                </h4>
+                <p className="text-[#00C2CB] font-mono text-[11px] leading-relaxed break-all bg-[#00C2CB]/[0.05] p-3 rounded-lg border border-[#00C2CB]/10 selection:bg-[#00C2CB] selection:text-white">
+                  {record.fingerprint}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            Verifications: <span className="text-[#006D77] font-black text-base">{record.verification_count}</span>
+
+          <div className="glass-card p-6 flex items-center justify-between">
+            <div>
+              <p className="text-[#8899AA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                Global Verifications
+              </p>
+              <p className="text-3xl font-black text-white font-[Space_Grotesk,sans-serif]">
+                {record.verification_count}
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-white/[0.04] flex items-center justify-center text-xl">
+              👁️
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-[#8899AA] mb-3">
+              Asset ID:{" "}
+              <span className="font-mono text-white/60">
+                {record.asset_id}
+              </span>
+            </p>
           </div>
         </div>
       </div>

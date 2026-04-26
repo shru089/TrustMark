@@ -6,7 +6,7 @@ Flow
 1. Validate Firebase JWT from Authorization header → extract uid + email.
 2. Read the uploaded image bytes from the multipart form.
 3. Generate a Gemini fingerprint (description + SHA-256).
-4. Embed the LSB watermark (creator uid) into the image.
+4. Embed the LSB watermark (asset_id) into the image.
 5. Upload both the original and watermarked images to GCS.
 6. Write an immutable ProvenanceRecord to Firestore.
 7. Return the asset_id and public certificate URL.
@@ -86,7 +86,7 @@ async def protect_asset(
         # 3. Embed LSB watermark
         # ------------------------------------------------------------------
         logger.info("Embedding LSB watermark for asset %s", asset_id)
-        watermarked_bytes = await watermark.embed(image_bytes, owner_uid)
+        watermarked_bytes = await watermark.embed(image_bytes, asset_id)
 
         # ------------------------------------------------------------------
         # 4. Upload to GCS (original + watermarked)
@@ -96,8 +96,11 @@ async def protect_asset(
 
         logger.info("Uploading images to GCS for asset %s", asset_id)
         original_url, watermarked_url = await _upload_pair(
-            image_bytes, original_blob,
-            watermarked_bytes, watermarked_blob,
+            image_bytes,
+            original_blob,
+            file.content_type or "image/png",
+            watermarked_bytes,
+            watermarked_blob,
         )
 
         # Public certificate URL (served by the frontend)
@@ -153,6 +156,7 @@ async def protect_asset(
 async def _upload_pair(
     original_bytes: bytes,
     original_blob: str,
+    original_content_type: str,
     watermarked_bytes: bytes,
     watermarked_blob: str,
 ) -> tuple[str, str]:
@@ -160,7 +164,7 @@ async def _upload_pair(
     import asyncio
 
     original_url, watermarked_url = await asyncio.gather(
-        gcs.upload_bytes(original_bytes, original_blob, content_type="image/png"),
+        gcs.upload_bytes(original_bytes, original_blob, content_type=original_content_type),
         gcs.upload_bytes(watermarked_bytes, watermarked_blob, content_type="image/png"),
     )
     return original_url, watermarked_url

@@ -12,16 +12,31 @@ export default function AuthButton() {
   }, []);
 
   if (!mounted || loading) {
-    return <div className="w-28 h-9 rounded-md bg-gray-800 animate-pulse" />;
+    return (
+      <div className="w-28 h-9 rounded-full bg-white/[0.06] animate-pulse" />
+    );
   }
 
   if (user) {
     return (
-      <div className="flex items-center gap-6">
-        <span className="text-sm text-gray-500 font-bold hidden sm:block tracking-tight">{user.email}</span>
+      <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2">
+          {user.photoURL && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.photoURL}
+              alt={user.displayName || "User"}
+              className="w-7 h-7 rounded-full border border-white/20"
+            />
+          )}
+          <span className="text-xs text-[#8899AA] font-medium truncate max-w-[140px]">
+            {user.email}
+          </span>
+        </div>
         <button
+          id="auth-signout-btn"
           onClick={logout}
-          className="text-sm bg-white/60 hover:bg-[#922D50] hover:text-white text-[#922D50] px-6 py-3 rounded-full font-bold transition-all border border-[#922D50]/20"
+          className="btn-ghost text-xs"
         >
           Sign Out
         </button>
@@ -31,8 +46,9 @@ export default function AuthButton() {
 
   return (
     <button
+      id="auth-signin-btn"
       onClick={login}
-      className="btn-liquid px-8 py-3 text-sm shadow-md"
+      className="btn-primary text-sm px-5 py-2.5"
     >
       Sign In
     </button>

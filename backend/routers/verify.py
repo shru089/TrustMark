@@ -4,8 +4,8 @@ TrustMark – POST /verify router.
 Verification strategy (multi-layer)
 ------------------------------------
 Layer 1 – LSB watermark extraction
-    Try to extract the creator uid from the image's least-significant bits.
-    If found, cross-reference with Firestore by owner_uid.
+    Try to extract the protected asset_id from the image's least-significant bits.
+    If found, fetch that exact asset from Firestore.
 
 Layer 2 – Exact fingerprint match
     Generate a Gemini fingerprint of the uploaded image and query Firestore
@@ -25,9 +25,7 @@ from __future__ import annotations
 import base64
 import logging
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-
-from backend.dependencies import get_current_user
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from backend.models.schemas import VerifyResponse
 from backend.services import firestore, watermark
 from backend.services.gemini import generate_fingerprint, jaccard_similarity
@@ -55,7 +53,6 @@ ALLOWED_MIME = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 )
 async def verify_asset(
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user),
 ) -> VerifyResponse:
     # ------------------------------------------------------------------
     # Validate upload
@@ -73,15 +70,24 @@ async def verify_asset(
         # ------------------------------------------------------------------
         # Layer 1 – LSB watermark extraction
         # ------------------------------------------------------------------
-        extracted_uid = await watermark.extract(image_bytes)
-        if extracted_uid:
-            logger.info("LSB watermark found, owner_uid=%s", extracted_uid)
-            records = await firestore.list_by_owner(extracted_uid)
-            if records:
-                # Multiple assets may belong to the same owner; return newest
-                record = records[0]
+        extracted_value = await watermark.extract(image_bytes)
+        if extracted_value:
+            logger.info("LSB watermark found, extracted_value=%s", extracted_value)
+            record = await firestore.get_record(extracted_value)
+            if record:
                 await firestore.increment_verification_count(record["asset_id"])
                 return _build_response(record, confidence=1.0, message="Watermark extracted")
+
+            # Backward compatibility for older demo assets that embedded owner_uid.
+            legacy_records = await firestore.list_by_owner(extracted_value)
+            if legacy_records:
+                record = legacy_records[0]
+                await firestore.increment_verification_count(record["asset_id"])
+                return _build_response(
+                    record,
+                    confidence=0.97,
+                    message="Legacy watermark extracted",
+                )
 
         # ------------------------------------------------------------------
         # Layer 2 – Exact Gemini fingerprint match

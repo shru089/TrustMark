@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import { AuthProvider } from "@/lib/auth-context";
 import Navbar from "@/components/Navbar";
 import type { ReactNode } from "react";
@@ -13,15 +12,18 @@ export default function ClientShell({ children }: { children: ReactNode }) {
     setMounted(true);
   }, []);
 
-  // Return a simple loading state or the children without providers during SSR
   if (!mounted) {
-    return <div className="bg-[#080b14] min-h-screen">{children}</div>;
+    return (
+      <div className="bg-[#050D1A] min-h-screen relative z-10">{children}</div>
+    );
   }
 
   return (
     <AuthProvider>
-      <Navbar />
-      <main>{children}</main>
+      <div className="relative z-10">
+        <Navbar />
+        <main>{children}</main>
+      </div>
     </AuthProvider>
   );
 }

@@ -91,6 +91,14 @@ async function authHeaders(): Promise<HeadersInit> {
   return { Authorization: `Bearer ${token}` };
 }
 
+async function optionalAuthHeaders(): Promise<HeadersInit> {
+  try {
+    return await authHeaders();
+  } catch {
+    return {};
+  }
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (res.ok) {
     return res.json() as Promise<T>;
@@ -143,7 +151,7 @@ export async function protectAsset(
  * Uploads a potentially-copied image and returns match results.
  */
 export async function verifyAsset(file: File): Promise<VerifyResponse> {
-  const headers = await authHeaders();
+  const headers = await optionalAuthHeaders();
 
   const form = new FormData();
   form.append("file", file);

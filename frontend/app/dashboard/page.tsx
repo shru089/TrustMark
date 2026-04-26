@@ -32,94 +32,171 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-4">
-        <div className="liquid-card p-12 max-w-md w-full text-center">
-          <div className="w-20 h-20 rounded-full bg-[#006D77]/10 flex items-center justify-center text-[#006D77] text-3xl mb-8 mx-auto">📊</div>
-          <h2 className="text-3xl font-black mb-6">Authentication Required</h2>
-          <p className="text-gray-500 mb-4 font-medium">Please sign in to view your dashboard.</p>
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6">
+        <div className="glass-card glow-border max-w-md w-full p-12 text-center">
+          <div className="w-20 h-20 rounded-full bg-[#00C2CB]/10 border border-[#00C2CB]/20 flex items-center justify-center text-4xl mx-auto mb-8">
+            📊
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Authentication Required
+          </h2>
+          <p className="text-[#8899AA] mb-8 leading-relaxed">
+            Please sign in to view your secure creator dashboard.
+          </p>
         </div>
       </div>
     );
   }
 
   if (loading) {
-    return <div className="text-center mt-32 text-gray-500 font-medium">Loading dashboard...</div>;
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-2 border-white/10 border-t-[#00C2CB] animate-spin mb-4" />
+        <p className="text-[#8899AA] text-sm animate-pulse">
+          Loading secure dashboard...
+        </p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center mt-32 text-[#922D50] font-bold">{error}</div>;
+    return (
+      <div className="text-center mt-32 text-[#E63E6D] font-bold bg-[#E63E6D]/10 py-4 px-6 rounded-2xl inline-block">
+        {error}
+      </div>
+    );
   }
 
+  const totalVerifications =
+    data?.assets.reduce((sum, a) => sum + a.verification_count, 0) || 0;
+
   return (
-    <div className="max-w-6xl mx-auto mt-12 px-4 pb-20">
-      <div className="flex justify-between items-end mb-10">
+    <div className="max-w-6xl mx-auto mt-12 px-6 pb-28">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
-          <h1 className="text-4xl font-black mb-2 liquid-text-gradient">Creator Dashboard</h1>
-          <p className="text-gray-500 font-medium">Manage your protected assets and verification stats.</p>
+          <div className="badge-teal mb-4">Creator Console</div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Intelligence <span className="text-gradient">Hub</span>
+          </h1>
+          <p className="text-[#8899AA]">
+            Manage your registered assets, track verifications, and monitor
+            provenance.
+          </p>
         </div>
         <Link
           href="/protect"
-          className="btn-liquid-primary px-8 py-3 text-base"
+          className="btn-primary text-sm px-6 py-3 whitespace-nowrap"
         >
-          Protect New Asset
+          + Protect New Asset
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div className="liquid-card p-8">
-          <h3 className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-2">Total Protected</h3>
-          <p className="text-4xl font-black text-[#006D77]">{data?.total || 0}</p>
+      {/* Stats overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="stat-card group">
+          <h3 className="text-[#8899AA] text-xs font-bold uppercase tracking-widest mb-3">
+            Total Protected Assets
+          </h3>
+          <div className="text-5xl font-[Space_Grotesk,sans-serif] font-black text-white group-hover:text-[#00C2CB] transition-colors">
+            {data?.total || 0}
+          </div>
         </div>
-        <div className="liquid-card p-8">
-          <h3 className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-2">Total Verifications</h3>
-          <p className="text-4xl font-black text-[#922D50]">
-            {data?.assets.reduce((sum, a) => sum + a.verification_count, 0) || 0}
-          </p>
+        <div className="stat-card group">
+          <h3 className="text-[#8899AA] text-xs font-bold uppercase tracking-widest mb-3">
+            Global Verifications
+          </h3>
+          <div className="text-5xl font-[Space_Grotesk,sans-serif] font-black text-white group-hover:text-[#E63E6D] transition-colors">
+            {totalVerifications}
+          </div>
         </div>
-        <div className="liquid-card p-8">
-          <h3 className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-2">Account Status</h3>
-          <p className="text-xl font-black text-[#006D77] flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#006D77] animate-pulse block"></span> Active
-          </p>
+        <div className="stat-card">
+          <h3 className="text-[#8899AA] text-xs font-bold uppercase tracking-widest mb-3">
+            System Status
+          </h3>
+          <div className="flex items-center gap-3 mt-4">
+            <div className="relative flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C2CB] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-[#00C2CB]"></span>
+            </div>
+            <span className="text-white font-medium">Neural Net Online</span>
+          </div>
         </div>
       </div>
 
-      <h2 className="text-2xl font-black mb-6 border-b border-[#006D77]/10 pb-4">Your Portfolio</h2>
+      <div className="flex items-center gap-4 mb-8 border-b border-white/[0.06] pb-4">
+        <h2 className="text-2xl font-bold text-white">Asset Registry</h2>
+        <span className="px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[#8899AA] text-xs font-bold">
+          {data?.assets.length || 0}
+        </span>
+      </div>
 
+      {/* Empty state */}
       {data?.assets.length === 0 ? (
-        <div className="liquid-card text-center py-20">
-          <p className="text-gray-500 mb-4 font-medium">You haven&apos;t protected any assets yet.</p>
-          <Link href="/protect" className="text-[#006D77] hover:text-[#922D50] transition font-bold">Get started →</Link>
+        <div className="glass-card text-center py-24 flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-white/[0.04] flex items-center justify-center text-3xl mb-4">
+            📦
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">No assets yet</h3>
+          <p className="text-[#8899AA] mb-6 max-w-sm">
+            Your protected portfolio is empty. Register your first piece of
+            content to start tracking its provenance.
+          </p>
+          <Link href="/protect" className="btn-secondary text-sm">
+            Get Started
+          </Link>
         </div>
       ) : (
+        /* Asset grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data?.assets.map((asset) => (
-            <div key={asset.asset_id} className="liquid-card overflow-hidden group">
-              <div className="aspect-[4/3] bg-gray-100 relative rounded-t-[3rem] overflow-hidden">
+            <div
+              key={asset.asset_id}
+              className="glass-card overflow-hidden group flex flex-col"
+            >
+              {/* Image container */}
+              <div className="aspect-[4/3] bg-black/40 relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={asset.watermarked_image_url}
                   alt={asset.title || "Asset"}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 group-hover:opacity-80 transition duration-700"
                 />
-                <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#006D77] border border-[#006D77]/20">
+                <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider border border-white/10">
                   {asset.license_type}
                 </div>
+                {/* ID badge overlay on hover */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                  <span className="font-mono text-xs text-[#00C2CB] bg-[#00C2CB]/10 px-3 py-1 rounded-md border border-[#00C2CB]/20">
+                    ID: {asset.asset_id.split("-")[0]}...
+                  </span>
+                </div>
               </div>
-              <div className="p-6">
-                <h3 className="font-black text-lg text-[#1A1C1E] mb-1 truncate">{asset.title || "Untitled"}</h3>
-                <p className="text-xs text-gray-400 mb-4 font-medium">{new Date(asset.created_at).toLocaleDateString()}</p>
 
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-sm">
-                    <span className="text-gray-400 font-medium">Verifications: </span>
-                    <span className="text-[#006D77] font-black">{asset.verification_count}</span>
+              {/* Details */}
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="font-bold text-lg text-white mb-1 truncate">
+                  {asset.title || "Untitled"}
+                </h3>
+                <p className="text-xs text-[#8899AA] mb-6">
+                  {new Date(asset.created_at).toLocaleDateString()}
+                </p>
+
+                <div className="mt-auto flex justify-between items-center pt-4 border-t border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#00C2CB]" />
+                    <span className="text-xs text-[#8899AA] font-medium">
+                      Verifications:{" "}
+                      <span className="text-white">
+                        {asset.verification_count}
+                      </span>
+                    </span>
                   </div>
                   <Link
                     href={`/cert/${asset.asset_id}`}
-                    className="text-sm text-white bg-[#006D77] hover:bg-[#922D50] px-4 py-1.5 rounded-full transition font-bold"
+                    className="text-xs font-bold text-[#00C2CB] hover:text-white transition-colors"
                   >
-                    Certificate
+                    View Cert →
                   </Link>
                 </div>
               </div>

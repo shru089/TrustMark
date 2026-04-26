@@ -3,12 +3,12 @@ TrustMark – LSB Steganography watermarking service.
 
 Strategy
 --------
-We embed the creator_id string into the least-significant bits of the
+We embed the asset_id string into the least-significant bits of the
 image's pixel data using the `stegano` library (pure-Python LSB).
 
 The payload we hide is:
 
-    TRUSTMARK:<creator_id>
+    TRUSTMARK:<asset_id>
 
 This prefix lets us distinguish TrustMark watermarks from random noise
 during extraction.
@@ -24,8 +24,8 @@ JPEG compression.  To survive JPEG 85% re-save we:
 
 Usage
 -----
-    watermarked_bytes = await embed(image_bytes, creator_id)
-    creator_id        = await extract(watermarked_bytes)   # None if not found
+    watermarked_bytes = await embed(image_bytes, asset_id)
+    asset_id          = await extract(watermarked_bytes)   # None if not found
 """
 
 from __future__ import annotations
@@ -50,23 +50,23 @@ WATERMARK_PREFIX = "TRUSTMARK:"
 # Public async interface
 # ---------------------------------------------------------------------------
 
-async def embed(image_bytes: bytes, creator_id: str) -> bytes:
+async def embed(image_bytes: bytes, asset_id: str) -> bytes:
     """
-    Embed *creator_id* into *image_bytes* using LSB steganography.
+    Embed *asset_id* into *image_bytes* using LSB steganography.
 
     Returns PNG bytes (lossless) regardless of the input format so the
     watermark data is preserved.  The caller stores this in GCS and
     delivers it to the end-user.
     """
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(_executor, _embed_sync, image_bytes, creator_id)
+    return await loop.run_in_executor(_executor, _embed_sync, image_bytes, asset_id)
 
 
 async def extract(image_bytes: bytes) -> str | None:
     """
     Attempt to extract a TrustMark watermark from *image_bytes*.
 
-    Returns the creator_id string if found, otherwise None.
+    Returns the embedded asset_id string if found, otherwise None.
     """
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(_executor, _extract_sync, image_bytes)
@@ -76,9 +76,9 @@ async def extract(image_bytes: bytes) -> str | None:
 # Synchronous worker functions (run in thread pool)
 # ---------------------------------------------------------------------------
 
-def _embed_sync(image_bytes: bytes, creator_id: str) -> bytes:
+def _embed_sync(image_bytes: bytes, asset_id: str) -> bytes:
     """Synchronous LSB embedding – called from the thread pool."""
-    payload = f"{WATERMARK_PREFIX}{creator_id}"
+    payload = f"{WATERMARK_PREFIX}{asset_id}"
 
     # stegano requires a PIL Image object; we work via an in-memory file
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
