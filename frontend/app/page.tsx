@@ -270,7 +270,7 @@ export default function Home() {
               </h3>
               <p className="text-[#8899AA] leading-relaxed">
                 Unlike basic EXIF metadata (trivially stripped in one click),
-                TrustMark's Gemini-generated perceptual fingerprint is
+                TrustMark&apos;s Gemini-generated perceptual fingerprint is
                 content-aware. It survives JPEG re-saves, Instagram filters,
                 40% crops, color grading, and screenshot re-photography.
               </p>

@@ -17,6 +17,14 @@
 
 ---
 
+**🚀 Quick Links for Hackathon Submission:**
+- [Live Demo URL](https://trustmark.web.app) *(Update with your final Firebase Hosting URL)*
+- [Demo Video (Loom)](https://loom.com/) *(Update with your video link)*
+- [Pitch Deck / Presentation](#) *(Update with your presentation link)*
+- [PRD & Implementation Spec](./TrustMark_PRD_Spec.md)
+
+---
+
 ## ⚡ The Core Problem
 Every second, thousands of digital assets—images, documents, and creative works—are stolen, manipulated, forged, or falsely attributed. Existing solutions like visible watermarks are easily cropped out, EXIF metadata is trivially wiped in one click, and blockchain NFTs are too expensive and inaccessible for mainstream adoption.
 
